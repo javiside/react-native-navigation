@@ -5,26 +5,38 @@ import { MEALS } from "../utils/mock/dummy-data";
 import Colors from "../utils/constants/colors";
 import Subtitle from "../components/MealDetails/Subtitle";
 import List from "../components/MealDetails/List";
-import { useLayoutEffect } from "react";
+import { useContext, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import IconButton from "../components/IconButton";
+import { FavoritesContext } from "../store/context/favorites-context";
 
 export default function MealDetailsScreen({ route }) {
+  const favoritesCtx = useContext(FavoritesContext);
   const { setOptions } = useNavigation();
+
   const mealId = route.params.id;
   const meal = MEALS.find((meal) => meal.id === mealId);
+  const isMealFavorite = favoritesCtx.ids.includes(mealId);
 
-  const PressHandler = () => {
-    console.log("pressed");
+  const toggleFavorite = () => {
+    if (isMealFavorite) {
+      favoritesCtx.removeFavorite(mealId);
+    } else {
+      favoritesCtx.addFavorite(mealId);
+    }
   };
 
   useLayoutEffect(() => {
     setOptions({
       headerRight: () => (
-        <IconButton icon="star" color={Colors.white} onPress={PressHandler} />
+        <IconButton
+          icon={isMealFavorite ? "star" : "star-outline"}
+          color={Colors.white}
+          onPress={toggleFavorite}
+        />
       ),
     });
-  }, [setOptions]);
+  }, [setOptions, toggleFavorite]);
 
   return (
     <ScrollView style={styles.wrapper}>
