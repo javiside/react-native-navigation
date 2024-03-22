@@ -1,28 +1,31 @@
+import { useLayoutEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
-import MealDetails from "../components/MealDetails/MealDetails";
+import { useNavigation } from "@react-navigation/native";
 
+import IconButton from "../components/IconButton";
+import List from "../components/MealDetails/List";
+import MealDetails from "../components/MealDetails/MealDetails";
+import Subtitle from "../components/MealDetails/Subtitle";
+
+import { addFavorite, removeFavorite } from "../store/redux/favorites";
 import { MEALS } from "../utils/mock/dummy-data";
 import Colors from "../utils/constants/colors";
-import Subtitle from "../components/MealDetails/Subtitle";
-import List from "../components/MealDetails/List";
-import { useContext, useLayoutEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
-import IconButton from "../components/IconButton";
-import { FavoritesContext } from "../store/context/favorites-context";
 
 export default function MealDetailsScreen({ route }) {
-  const favoritesCtx = useContext(FavoritesContext);
+  const favoriteIds = useSelector((state) => state.favorites.ids);
+  const dispatch = useDispatch();
   const { setOptions } = useNavigation();
 
   const mealId = route.params.id;
   const meal = MEALS.find((meal) => meal.id === mealId);
-  const isMealFavorite = favoritesCtx.ids.includes(mealId);
+  const isMealFavorite = favoriteIds.includes(mealId);
 
   const toggleFavorite = () => {
     if (isMealFavorite) {
-      favoritesCtx.removeFavorite(mealId);
+      dispatch(removeFavorite({ id: mealId }));
     } else {
-      favoritesCtx.addFavorite(mealId);
+      dispatch(addFavorite({ id: mealId }));
     }
   };
 
